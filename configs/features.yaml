@@ -1,0 +1,57 @@
+# ==============================================================================
+# StockPulse AI - Feature Engineering Configuration
+# ==============================================================================
+
+version: "v1.0"
+
+# Target variable definition
+target:
+  name: "target_direction"
+  description: "Next-day close-to-close price direction (1 for UP, 0 for DOWN/FLAT)"
+  type: "binary_classification"
+  horizon_days: 1
+  rule: "1 if close[t+1] > close[t] else 0"
+  leakage_prevention: "Target at time t requires close[t+1]; ensure shifted strictly by -1"
+
+# Technical Indicators
+indicators:
+  moving_averages:
+    sma:
+      - window: 5
+      - window: 20
+      - window: 50
+    ema:
+      - span: 12
+      - span: 26
+
+  momentum:
+    rsi:
+      window: 14
+    macd:
+      fast_period: 12
+      slow_period: 26
+      signal_period: 9
+
+  volatility:
+    bollinger_bands:
+      window: 20
+      num_std: 2.0
+    atr:
+      window: 14
+
+  volume:
+    obv:
+      enabled: true
+
+  returns:
+    lags:
+      - 1
+      - 2
+      - 3
+      - 5
+
+# Preprocessing & Data Cleaning
+preprocessing:
+  handle_missing: "drop" # Drop rows where rolling indicators produce NaNs
+  scale_features: true
+  scaler_type: "robust_scaler" # Robust to financial market outliers

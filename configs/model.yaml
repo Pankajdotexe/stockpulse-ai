@@ -1,0 +1,71 @@
+# ==============================================================================
+# StockPulse AI - Model Training & Evaluation Configuration
+# ==============================================================================
+
+# Walk-forward cross-validation settings (strictly chronological, avoiding lookahead)
+validation:
+  scheme: "walk_forward"
+  min_train_years: 3          # Minimum rolling/expanding training history
+  embargo_days: 5             # Default 5 trading days embargo to prevent temporal leakage
+  step_months: 3              # Walk-forward step window
+  test_size_months: 3         # Out-of-sample evaluation window per fold
+
+# Baseline models for honest comparison
+baselines:
+  - name: "majority_class"
+    description: "Always predicts the most frequent class in the training fold"
+  - name: "previous_day_direction"
+    description: "Predicts that today's return direction repeats tomorrow (momentum naive baseline)"
+  - name: "random_guess"
+    description: "Uniform 50/50 random prediction"
+
+# Candidate Machine Learning models
+models:
+  logistic_regression:
+    enabled: true
+    penalty: "l2"
+    c_values: [0.01, 0.1, 1.0, 10.0]
+    solver: "lbfgs"
+    max_iter: 1000
+
+  random_forest:
+    enabled: true
+    n_estimators: [100, 200]
+    max_depth: [5, 10, null]
+    min_samples_split: [10, 20]
+    random_state: 42
+
+  xgboost:
+    enabled: true
+    n_estimators: [100, 200]
+    max_depth: [3, 5]
+    learning_rate: [0.01, 0.05, 0.1]
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+
+  lightgbm:
+    enabled: true
+    n_estimators: [100, 200]
+    max_depth: [3, 5]
+    learning_rate: [0.01, 0.05, 0.1]
+    num_leaves: [15, 31]
+    random_state: 42
+
+# Evaluation metrics
+metrics:
+  primary: "roc_auc"
+  tracked:
+    - "roc_auc"
+    - "accuracy"
+    - "pr_auc"
+    - "f1"
+    - "precision"
+    - "recall"
+    - "brier_score"
+
+# Experiment tracking
+mlflow:
+  tracking_uri: "sqlite:///mlruns.db"
+  experiment_name: "stockpulse-nifty50-direction"
+  artifact_location: "./mlartifacts"

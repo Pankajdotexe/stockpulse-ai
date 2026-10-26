@@ -1,0 +1,86 @@
+name: stockpulse-ai
+
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: stockpulse-postgres
+    profiles:
+      - lite
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-stockpulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockpulse_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-stockpulse_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stockpulse} -d ${POSTGRES_DB:-stockpulse_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.16
+    container_name: stockpulse-redpanda
+    profiles:
+      - lite
+    command:
+      - redpanda
+      - start
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:9092
+      - --memory=512M
+      - --smp=1
+      - --overprovisioned
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+    ports:
+      - "9092:9092"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    mem_limit: 1024m
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.7.2
+    container_name: stockpulse-redpanda-console
+    profiles:
+      - tools
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    mem_limit: 256m
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redpanda_data:
+    driver: local
