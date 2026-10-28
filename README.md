@@ -41,9 +41,10 @@ StockPulse AI ingests daily market data for National Stock Exchange of India (**
 
 Optimized to run smoothly on a **MacBook M2 (Apple Silicon ARM64, 8 GB RAM)** with Docker Desktop constrained to **4 GB**:
 - Every container has an explicit `mem_limit`. Total Docker budget is capped under **2.5 GB**.
+- Real container memory limits: **Postgres 512M, Redpanda 1G, Console 256M** (~1.75 GB total).
 - **Redpanda Broker**: configured with `--memory 512M --smp 1 --overprovisioned`.
 - **Docker Compose Profiles**:
-  - `lite` (default): Starts PostgreSQL (`512M`) + Redpanda (`1024M` limit, `512M` cache) = ~1.5 GB total.
+  - `lite` (default): Starts PostgreSQL (`512M`) + Redpanda (`1G` limit, `512M` cache) = ~1.5 GB total.
   - `tools`: Redpanda Console (`256M`), off by default.
 - Heavy workloads (ML training, Vite development server, FastAPI) run on the host OS, avoiding Docker virtualization overhead.
 
@@ -98,7 +99,7 @@ stockpulse-ai/
 ### 5.2 Environment Setup
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-username/stockpulse-ai.git
+git clone https://github.com/Pankajdotexe/stockpulse-ai.git
 cd stockpulse-ai
 
 # 2. Copy environment template
@@ -137,7 +138,9 @@ make down
 ## 6. Implementation Roadmap
 
 - **Phase 0: Project Scaffolding & Foundation** (Completed)
-- **Phase 1: Ingestion Pipeline & Redpanda Streaming** (Next)
-- **Phase 2: Feature Store, Walk-Forward CV & Model Training**
-- **Phase 3: Real-Time Stream Consumer & Operational Metrics**
-- **Phase 4: FastAPI Prediction Serving & React Dashboard**
+- **Phase 1: Data** (In Progress)
+- **Phase 2: Features and ML**
+- **Phase 3: Streaming**
+- **Phase 4: Backend**
+- **Phase 5: Frontend**
+- **Phase 6: Polish**

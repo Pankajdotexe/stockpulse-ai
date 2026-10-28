@@ -118,10 +118,10 @@ Target Machine: **MacBook Air/Pro M2 (Apple Silicon ARM64), 8 GB RAM, Docker Des
 
 | Container / Process | Execution Mode | RAM Limit / Budget | CPU Allocation | Ports |
 | :--- | :--- | :--- | :--- | :--- |
-| **PostgreSQL 16** | Docker (`lite`) | `512 MB` | 1 core | `5432:5432` |
-| **Redpanda Broker** | Docker (`lite`) | `1024 MB` (`--memory 512M`) | 1 core (`--smp 1`) | `9092:9092` |
-| **Redpanda Console**| Docker (`tools`)| `256 MB` | 0.5 core | `8080:8080` |
-| **Total Docker** | — | **~1.79 GB** (Well under 2.5 GB cap) | — | — |
+| **PostgreSQL 16** | Docker (`lite`) | `512 MB` (Postgres 512M) | 1 core | `5432:5432` |
+| **Redpanda Broker** | Docker (`lite`) | `1024 MB` (Redpanda 1G, `--memory 512M`) | 1 core (`--smp 1`) | `9092:9092` |
+| **Redpanda Console**| Docker (`tools`)| `256 MB` (Console 256M) | 0.5 core | `8080:8080` |
+| **Total Docker** | — | **~1.75 GB** (Postgres 512M, Redpanda 1G, Console 256M, budget < 2.5 GB) | — | — |
 | **FastAPI Backend** | Host Python 3.11 | ~150 MB | Host OS | `8000` |
 | **ML Training Worker**| Host Python 3.11 | ~800 MB - 1.2 GB | Host OS | — |
 | **Vite Dev Server** | Host Node 20 | ~150 MB | Host OS | `5173` |

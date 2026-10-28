@@ -7,9 +7,9 @@ services:
     profiles:
       - lite
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-stockpulse}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockpulse_dev_password}
-      POSTGRES_DB: ${POSTGRES_DB:-stockpulse_db}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -20,7 +20,7 @@ services:
           memory: 512M
     mem_limit: 512m
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stockpulse} -d ${POSTGRES_DB:-stockpulse_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
